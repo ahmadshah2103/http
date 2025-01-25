@@ -33,9 +33,7 @@ This project implements an HTTP v1.1 server that can handle `GET` request and se
 
 To run in development mode:
 
-    ```bash
     make watch
-    ```
 
 ## Project Structure
 
