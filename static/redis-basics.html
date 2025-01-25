@@ -1,0 +1,719 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Redis Basics</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-default_background {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.highlight-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.block-color-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: rgba(35, 131, 226, .07); }
+.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+.select-value-color-transparentGray { background-color: rgba(227, 226, 224, 0); }
+.select-value-color-translucentGray { background-color: rgba(0, 0, 0, 0.06); }
+.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+.select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
+.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="9b720bfb-52ee-4702-985e-6c00268e1196" class="page sans"><header><img class="page-cover-image" src="https://www.notion.so/images/page-cover/gradients_10.jpg" style="object-position:center 40%"/><div class="page-header-icon page-header-icon-with-cover"><img class="icon" src="Redis.png"/></div><h1 class="page-title"><em>Redis</em> Basics</h1><p class="page-description"></p></header><div class="page-body"><h1 id="0246a1a8-241c-4df3-bf7e-d433bea9b460" class="">What is Redis</h1><p id="fe51b0c4-116b-488b-b972-5648cb0eda31" class="">Redis is an open-source, in-memory data structure store, used as a database, cache, and message broker. It supports data structures such as strings, hashes, lists, sets, sorted sets with range queries, bitmaps, hyperloglogs, geospatial indexes, and streams.</p><h1 id="83645eaf-505f-4328-9118-552c468ce310" class="">Getting Started</h1><ol type="1" id="a5497382-6832-4c78-966c-a210fbea5df7" class="numbered-list" start="1"><li>Open a terminal (WSL on windows).</li></ol><ol type="1" id="a556c10f-0cfc-4f10-8d15-cda236b888c0" class="numbered-list" start="2"><li>To install <em>Redis</em>, run the following command:<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="a85d4adc-d8d3-41b9-b6f2-b9f972f5644f" class="code"><code class="language-Bash">sudo apt-get install redis</code></pre></li></ol><ol type="1" id="f1e50dbc-72a8-4cda-b851-ffa2dd148c51" class="numbered-list" start="3"><li>Run this command to start the <em>Redis </em>server:<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="4756df0e-2946-4a0a-9e37-0f59543e2879" class="code"><code class="language-Bash">redis-server</code></pre></li></ol><ol type="1" id="c910192b-77b9-485e-9df6-a08345bb6ed7" class="numbered-list" start="4"><li>To interact with <em>Redis </em>database, run the following command in another terminal while not terminating the previous one:<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="6f38580f-ca68-4e6b-bf80-c18f4d3be6cb" class="code"><code class="language-Bash">redis-cli</code></pre></li></ol><h1 id="4618979d-1e76-46e8-9785-208a864f2346" class="">Redis CLI</h1><h2 id="3ad2d0e4-6d5e-4731-a812-b197a25ddf9d" class="">Basic Commands</h2><p id="66d25a82-cb71-45f6-81d5-41dc71598075" class="">The commands can be both upper and lower case.</p><ol type="1" id="159be008-f986-4a95-be1c-da0a89b906f7" class="numbered-list" start="1"><li><code>quit</code> Exits from <em>Redis CLI</em>.</li></ol><ol type="1" id="ad5b3d09-e793-4cd6-a7b2-cb36025c1a76" class="numbered-list" start="2"><li><code>SET key value</code> Sets value to key.</li></ol><ol type="1" id="5124e2bb-2536-40f5-8a1f-ea28a4fb5888" class="numbered-list" start="3"><li><code>GET key</code> Gets value of key.</li></ol><ol type="1" id="a77347a9-4be4-4dbf-b0de-ac0de5d2f431" class="numbered-list" start="4"><li><code>DEL key</code>  Deletes of key and its value.</li></ol><ol type="1" id="834016ec-cc13-4a0c-9b55-768a78dc7794" class="numbered-list" start="5"><li><code>EXISTS key</code> Checks if the key exists.</li></ol><ol type="1" id="c5838fc0-299f-4b9e-8414-dbd211e6c72b" class="numbered-list" start="6"><li><code>KEYS *</code> Gets list of all the keys.</li></ol><ol type="1" id="549443e2-8c52-4456-994f-29c30a2ada24" class="numbered-list" start="7"><li><code>FLUSHALL</code>  Clear the database.</li></ol><p id="a06e5da5-43dd-4107-b5ae-5c1bdd230341" class=""><strong>Note: </strong>To set values with more than one words, enclose the values in double quotes, like this:</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="002d2897-4b87-437f-b6e9-ae428874b8a0" class="code"><code class="language-Bash">SET key &quot;value with more than one words&quot;</code></pre><h2 id="cdee2d97-9cdb-44e7-be25-5a897278ba53" class="">Expirations Time</h2><p id="a5331924-9e3f-4e67-922f-2ddfd9870e90" class="">We can set the duration for which a specific key would exist called Time to Live (ttl). We can do this in two ways:</p><ol type="1" id="c22af51e-3119-402c-95ef-fdcd6b53093b" class="numbered-list" start="1"><li><strong>Setting Expiration Time</strong><ol type="a" id="4af4d8c0-8408-44ad-a232-683a397d15f1" class="numbered-list" start="1"><li>Setting key-value, then setting <code>ttl</code> . (time has a unit of seconds)<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="437b9624-9808-43eb-bcd9-a97e577584d4" class="code"><code class="language-Bash">SET key value
+EXPIRE key time</code></pre></li></ol><ol type="a" id="1ca3b35d-1049-41a9-91e2-25a5b32fe7f1" class="numbered-list" start="2"><li>Setting <code>ttl</code> directly with setting key-value.<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="ef9479ba-92a3-4e46-8834-035636498574" class="code"><code class="language-Bash">SETEX key time value</code></pre></li></ol></li></ol><ol type="1" id="e4ccbe9d-f8e8-4b1a-b5cd-95bf53fff0a5" class="numbered-list" start="2"><li><strong>Seeing Expiration Time</strong><p id="8f941a66-9e57-434d-bfc3-6c694f395c27" class="">This returns the remaining time in seconds.</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="01fce6a3-3fef-472d-8cbb-58d8d2dc9073" class="code"><code class="language-Bash">ttl key</code></pre></li></ol><h2 id="a17c24ca-3b04-44da-81b9-b72a7ca03400" class="">Redis Data Structures</h2><h3 id="087b8e06-0b09-413e-99d9-06a01659c6cc" class="">Lists</h3><p id="e9e900bf-92c6-4c05-88e0-7733c1082e6d" class="">By default, <em>Redis </em>saves and returns string values. For example, the <code>SET</code> and <code>GET</code> commands saves and returns string values.</p><p id="2bec3d2f-34b4-43fd-a20a-20adb0f27558" class="">To work with lists (arrays), the following are some basic commands:</p><ol type="1" id="2718bb1f-c32a-4158-999c-e178f6ecccaf" class="numbered-list" start="1"><li><code>LPUSH list-name value</code> Pushes value to the left (start) of the list.</li></ol><ol type="1" id="21658195-6659-4057-8f35-84f5753ba9ab" class="numbered-list" start="2"><li><code>RPUSH list-name value</code> Pushes value to the right (end) of the list.</li></ol><ol type="1" id="a7a98edc-c2f1-47f2-bdbe-edb6e816c493" class="numbered-list" start="3"><li><code>LPOP list-name</code> Pops value from the left (start) of the list.</li></ol><ol type="1" id="cfe51f03-6bc0-4e04-8d15-320de8543df4" class="numbered-list" start="4"><li><code>RPOP list-name</code>Pops value to the right (end) of the list.</li></ol><ol type="1" id="22fc808b-dae9-4d87-9461-7080a20582d7" class="numbered-list" start="5"><li><code>lrnage list-name &lt;start&gt; &lt;end&gt;</code> Returns the elements of the list form index <code>&lt;start&gt;</code> to <code>&lt;end&gt;</code> .</li></ol><figure class="block-color-gray_background callout" style="white-space:pre-wrap;display:flex" id="bccf9e97-6a81-4419-9cb8-1b0bfb384619"><div style="font-size:1.5em"><span class="icon">💡</span></div><div style="width:100%">Lists can have duplicate values, but if one needs a data structure to store unique values only then <em>sets</em> are there for you. </div></figure><p id="4ff3dd21-1dcb-4702-9e0e-f513e6fb2399" class="block-color-default">Multiple values can be added (But cannot remove multiple values) to a list in a single command as following:</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="45517767-582b-4f54-9847-3a21f5f30b07" class="code"><code class="language-Bash"># List
+LPUSH list-name value1 value2 value3
+RPUSH list-name value1 value2 value3</code></pre><h3 id="3755055f-81fc-4b9a-b48a-b8e45e0d5501" class="">Sets</h3><p id="150c9b23-a190-400a-8360-4d34553130e7" class="">Sets are like list with difference being that it can store unique values only. Following are some commands for working with sets:</p><ol type="1" id="d8474567-df4d-42e7-b35c-7ab7cc681274" class="numbered-list" start="1"><li><code>SADD set-name value</code> Adds value to the set.</li></ol><ol type="1" id="7f2cfafe-e85e-4f7f-b34f-5f7520aae0b7" class="numbered-list" start="2"><li><code>SREM set-name value</code> Removes value from the set.</li></ol><ol type="1" id="fff9bb9c-b4eb-800e-a966-dcda8514aa46" class="numbered-list" start="3"><li><code>SMEMBERS set-name</code> Returns all the values of the set.</li></ol><p id="47662085-bfef-4294-9fe3-2f14a0c677e7" class="block-color-default">Multiple values can be added to a set and removed from a set in single command as following:</p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="db1f736b-ee36-4940-83fb-dca180357a91" class="code"><code class="language-Bash"># Adding values to a set
+SADD set-name value1 value2 value3
+
+# Removing values from a set
+SREM set-name value1 value2 value3</code></pre><h3 id="31975dc3-3be6-4e0d-a997-f18fe4c9f0b7" class="">Hashes</h3><p id="4c90c78e-664d-4dbf-a6e6-a5ad56507546" class="">Hashes are data structures in <em>Redis </em>that stores <em>field-value</em> pairs. Here are some basic operation of hashes:</p><ol type="1" id="26eb5ab4-5e1b-4603-90a1-0c81d22f9fa6" class="numbered-list" start="1"><li><code>HSET hash-name field1 value1 field2 value2 field3 value3</code> Creates new fields within the hash.</li></ol><ol type="1" id="8d07855a-3ccc-424f-8d15-72c743e4aa3c" class="numbered-list" start="2"><li><code>HGET hash-name field</code>  Returns the value of a specific field.</li></ol><ol type="1" id="0fd63e47-bcf9-42af-9d08-52b421607871" class="numbered-list" start="3"><li><code>HMSET hash-name field1 value1 field2 value2 field3 value3</code> Works similar to <code>HSET</code> .</li></ol><ol type="1" id="bd5773e6-c8a7-4a7f-aa93-9b0d0b582815" class="numbered-list" start="4"><li><code>HMGET hash-name field1 field2 field3</code> Returns values of multiple fields</li></ol><ol type="1" id="8de7c16e-e85c-43a2-93b4-33457ff528c8" class="numbered-list" start="5"><li><code>HDEL hash-name field</code> Deletes field</li></ol><ol type="1" id="5130d1f8-703d-407a-864f-ac59c88dd4ff" class="numbered-list" start="6"><li><code>HEXISTS hash-name field</code> Checks if the field exists.</li></ol><ol type="1" id="d2001ae7-e131-4c13-a325-9db18f424655" class="numbered-list" start="7"><li><code>HGETALL</code> Returns all the field-value pairs.</li></ol><p id="3e9875f8-6719-49d6-a7a7-b0e556a232be" class="">
+</p><h1 id="a4cfdda2-0fee-4979-a7b0-d76153581d9e" class="">Redis Caching in Python</h1><h2 id="039de84d-a1b0-42b2-9db4-043ed7c4d931" class="">Code Example</h2><p id="67181356-2c10-469a-8fc4-761fa5239f0b" class="">Here is an example code that demonstrates a simple Python application that utilizes Redis for caching results of a mathematical operation. </p><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg==" crossorigin="anonymous" referrerPolicy="no-referrer"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerPolicy="no-referrer"/><pre id="a06971a7-bf78-4594-8772-1149c6b207f1" class="code"><code class="language-Python">import time
+
+from redis import StrictRedis
+from redis_cache import RedisCache
+
+client = StrictRedis(host=&#x27;localhost&#x27;, port=6379, decode_responses=True)
+cache = RedisCache(redis_client=client)
+
+
+@cache.cache(ttl=60)
+def math_operation(n):
+    return sum(range(n))
+
+
+def main():
+    n = int(input(&quot;Enter value of n: &quot;))
+    t0 = time.time()
+    result = math_operation(n)
+    t1 = time.time()
+    
+    print(f&quot;Result: {result}, Time: {(t1 - t0)*1000:.2f}ms&quot;)
+
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre><p id="acc451a8-390e-409e-bbba-45e2ddf9bfe5" class="">
+</p><h2 id="ebfffc22-dfe6-457c-b078-5487d475a4ae" class="">Explanation</h2><p id="bceba8e4-c49d-4368-a81d-7750fc9e480b" class="">Here&#x27;s a breakdown of how caching with Redis is implemented in Python, referencing the given code:</p><ol type="1" id="a296bf2e-6f71-4dca-96d8-c5415e5fbbc5" class="numbered-list" start="1"><li><strong>Importing Required Libraries</strong>:<ul id="c3a7df30-a23d-4626-9f4c-8a66399263a2" class="bulleted-list"><li style="list-style-type:disc"><code>time</code>: Used for calculating the execution time of the operation.</li></ul><ul id="998f1d15-74fa-4300-a4b8-2e48e0ef24a6" class="bulleted-list"><li style="list-style-type:disc"><code>StrictRedis</code>: A class from the <code>redis</code> package that provides a client for interacting with Redis.</li></ul><ul id="eac16b07-3ecc-442d-b6e2-a3b408735746" class="bulleted-list"><li style="list-style-type:disc"><code>RedisCache</code>: A caching mechanism that interfaces with Redis,  from the <code>redis_cache</code> package.</li></ul></li></ol><ol type="1" id="c9b87e58-42e7-47b6-aff2-c2a96fde593a" class="numbered-list" start="2"><li><strong>Setting Up Redis Client</strong>:<ul id="2a3d6b6b-37c3-4a99-b72a-4cf5e094f323" class="bulleted-list"><li style="list-style-type:disc">A <code>StrictRedis</code> client is instantiated with connection details to the Redis server (<code>localhost</code> on port <code>6379</code>). The <code>decode_responses=True</code> parameter ensures responses from Redis are decoded from bytes to strings.</li></ul></li></ol><ol type="1" id="9daec384-3f49-4839-9f06-9424ec3f1d8a" class="numbered-list" start="3"><li><strong>Creating a RedisCache Instance</strong>:<ul id="7bcb573f-ffd4-4acf-a47c-a9ec65c396fb" class="bulleted-list"><li style="list-style-type:disc">An instance of <code>RedisCache</code> is created, passing the Redis client as an argument. This instance is used to manage caching.</li></ul></li></ol><ol type="1" id="c1a103c1-f51e-4d1f-a94a-3061559c7698" class="numbered-list" start="4"><li><strong>Caching Decorator</strong>:<ul id="20636c34-12ea-41ca-8823-c2c79b8e53ec" class="bulleted-list"><li style="list-style-type:disc">The <code>@cache.cache(ttl=60)</code> decorator is applied to the <code>math_operation</code> function. This decorator automatically caches the result of the function for 60 seconds (<code>ttl=60</code>). If the function is called again with the same arguments within this time frame, the cached result is returned instead of recalculating.</li></ul></li></ol><ol type="1" id="bf413321-09bd-4021-8215-5ec2e17522ca" class="numbered-list" start="5"><li><strong>Function to be Cached</strong>:<ul id="f8510e90-7ed8-4568-bda8-b526b324e247" class="bulleted-list"><li style="list-style-type:disc"><code>math_operation(n)</code>: A simple function that calculates the sum of numbers from 0 to <code>n-1</code>. This is the function whose result is cached.</li></ul></li></ol><ol type="1" id="25c3747d-4f6c-4ce1-853c-78630cd0812a" class="numbered-list" start="6"><li><strong>Main Function</strong>:<ul id="e261c7ef-cb70-421c-b90c-b5ba6d3aa62b" class="bulleted-list"><li style="list-style-type:disc">Prompts the user to enter a value for <code>n</code>.</li></ul><ul id="65e42034-8b10-4beb-bd22-363d122dead7" class="bulleted-list"><li style="list-style-type:disc">Measures and prints the execution time of <code>math_operation(n)</code>, demonstrating the potential time savings from using caching. The first call to <code>math_operation</code> with a specific <code>n</code> will compute and cache the result; subsequent calls with the same <code>n</code> within 60 seconds will fetch the result from the cache, likely reducing the execution time.</li></ul></li></ol><ol type="1" id="8f8c05ba-2679-4dc5-8a62-5b1d9ecc8b39" class="numbered-list" start="7"><li><strong>Execution Entry Point</strong>:<ul id="51994d01-8213-4136-b412-f488e4b3bb70" class="bulleted-list"><li style="list-style-type:disc">The standard Python idiom to specify the entry point of the application.</li></ul></li></ol><h2 id="06659a9f-43d3-4fe1-9871-c623502eb841" class=""><strong>Key Takeaways</strong></h2><ul id="ac205200-8d66-464a-82b6-5a2390e7db42" class="bulleted-list"><li style="list-style-type:disc"><strong>Caching with Redis in Python</strong> can significantly improve the performance of applications by storing the results of expensive function calls and reusing them.</li></ul><ul id="ca45e265-e834-447f-8a2d-b9e17463d1bd" class="bulleted-list"><li style="list-style-type:disc">The <code>redis</code> and <code>redis_cache</code> libraries provide convenient interfaces for interacting with Redis, including decorators for caching function results.</li></ul><ul id="c7ae5089-41bd-46f4-b462-d70ce1e4bee9" class="bulleted-list"><li style="list-style-type:disc">The <code>ttl</code> parameter in the caching decorator specifies how long (in seconds) the cached result should be considered valid. After this period, the result is recomputed on the next function call.</li></ul><ul id="db3b9473-fc34-4474-8687-fc5f5f7dd79e" class="bulleted-list"><li style="list-style-type:disc">This approach is particularly useful for applications with repeatable and time-consuming operations.</li></ul><p id="66c170f8-77ee-4b3d-97c7-313b3c946c7e" class="">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
