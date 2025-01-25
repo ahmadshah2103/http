@@ -51,17 +51,11 @@ To run in development mode:
 │   └── socket_utils.h
 ├── src
 │   ├── handlers.c
-│   ├── handlers.o
 │   ├── request_parser.c
-│   ├── request_parser.o
 │   ├── response_handler.c
-│   ├── response_handler.o
 │   ├── router.c
-│   ├── router.o
 │   ├── server.c
-│   ├── server.o
 │   ├── socket_utils.c
-│   └── socket_utils.o
 └── static
     ├── redis-basics.html
     └── vpc.html
